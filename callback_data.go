@@ -10,15 +10,19 @@ import (
 type CallbackData struct {
 	_msgpack struct{} `msgpack:",as_array"`
 
-	Command int8
-	ReplyTo bool // TODO маркер, нужно ли отвечать на сообщение или отрисовать новое
-	Payload interface{}
-	History *CallbackData
+	Command            int8
+	Payload            interface{}
+	NewMessageRequired bool
 }
 
-func ParseCallbackData(data []byte) (callbackData *CallbackData, err error) {
-	if len(data) == 0 {
+func ParseCallbackData(payload string) (callbackData *CallbackData, err error) {
+	if len(payload) == 0 {
 		return nil, errors.New("no callback data")
+	}
+
+	var data []byte
+	if data, err = base64.RawStdEncoding.DecodeString(payload); err != nil {
+		return
 	}
 
 	if err = msgpack.Unmarshal(data, &callbackData); err != nil {
@@ -28,8 +32,8 @@ func ParseCallbackData(data []byte) (callbackData *CallbackData, err error) {
 	return
 }
 
-func (p *CallbackData) String() string {
-	data, err := msgpack.Marshal(p)
+func (d *CallbackData) String() string {
+	data, err := msgpack.Marshal(d)
 	if err != nil {
 		return ""
 	}

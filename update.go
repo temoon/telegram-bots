@@ -25,6 +25,14 @@ func (u *Update) HasContact() bool {
 	return u.Message != nil && u.Message.Contact != nil
 }
 
+func (u *Update) CheckCommand(str string, code int8) bool {
+	return u.Command == str || u.CallbackData != nil && u.CallbackData.Command == code
+}
+
+func (u *Update) NewMessageRequired() bool {
+	return u.CallbackData == nil || u.CallbackData.NewMessageRequired
+}
+
 func ParseMessage(message *telegram.Message) (update *Update, err error) {
 	command, payload := parseText(StringOrEmpty(message.Text))
 
@@ -49,7 +57,7 @@ func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (update *Update, 
 	payload := StringOrEmpty(callbackQuery.Data)
 
 	var callbackData *CallbackData
-	if callbackData, err = ParseCallbackData([]byte(payload)); err != nil {
+	if callbackData, err = ParseCallbackData(payload); err != nil {
 		return
 	}
 
