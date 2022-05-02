@@ -3,9 +3,8 @@ package bots
 import (
 	"strings"
 
-	"github.com/temoon/go-telegram-bots-api"
-
-	. "github.com/temoon/go-telegram-bots-api/helpers"
+	"github.com/temoon/telegram-bots-api"
+	. "github.com/temoon/telegram-bots-api/helpers"
 )
 
 type Update struct {

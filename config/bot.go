@@ -7,7 +7,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/temoon/go-telegram-bots-api"
+	"github.com/temoon/telegram-bots-api"
 )
 
 const DefaultBotTimeout = time.Second * 10

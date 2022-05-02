@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/temoon/go-telegram-bots-api"
+	"github.com/temoon/telegram-bots-api"
 )
 
 type YandexRequest struct {

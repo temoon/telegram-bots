@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"github.com/temoon/go-telegram-bots-api"
+	"github.com/temoon/telegram-bots-api"
 )
 
 func IsServerlessFunction() bool {

@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/temoon/go-telegram-bots-api"
-	. "github.com/temoon/go-telegram-bots-api/helpers"
-	"github.com/temoon/go-telegram-bots-api/requests"
+	"github.com/temoon/telegram-bots-api"
+	. "github.com/temoon/telegram-bots-api/helpers"
+	"github.com/temoon/telegram-bots-api/requests"
 )
 
 func GetUserName(user *telegram.User) (name string) {
