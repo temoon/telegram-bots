@@ -20,25 +20,25 @@ type YandexResponse struct {
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func YandexHandler(ctx context.Context, req *YandexRequest, router Router) (res *YandexResponse, err error) {
+func YandexHandler(ctx context.Context, req *YandexRequest, h BaseHandler) (res *YandexResponse, err error) {
 	var update telegram.Update
 	if err = json.Unmarshal([]byte(req.Body), &update); err != nil {
 		return &YandexResponse{StatusCode: http.StatusBadRequest}, err
 	}
 
-	h := Handler{}
+	f := Frame{
+		Handler: h,
+	}
 
-	if err = h.onUpdate(ctx, &update, router); err != nil {
+	if err = f.onUpdate(ctx, &update); err != nil {
 		log.WithError(err).Error("on update")
 
 		var errWithStatusCode *ErrorWithStatusCode
 		if errors.As(err, &errWithStatusCode) {
-			res = &YandexResponse{StatusCode: errWithStatusCode.StatusCode}
+			return &YandexResponse{StatusCode: errWithStatusCode.StatusCode}, nil
 		} else {
-			res = &YandexResponse{StatusCode: http.StatusInternalServerError}
+			return &YandexResponse{StatusCode: http.StatusInternalServerError}, err
 		}
-
-		return
 	}
 
 	return &YandexResponse{StatusCode: http.StatusOK, Body: "OK"}, nil

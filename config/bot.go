@@ -2,8 +2,6 @@ package config
 
 import (
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -43,6 +41,12 @@ func GetBotEnvironment() (value string) {
 }
 
 func IsBotUserAllowed(userId int64) bool {
+	for _, disallowedUserId := range GetBotDisallowedUsers() {
+		if disallowedUserId == userId {
+			return false
+		}
+	}
+
 	allowedUsers := GetBotAllowedUsers()
 	if len(allowedUsers) == 0 {
 		return true
@@ -58,27 +62,9 @@ func IsBotUserAllowed(userId int64) bool {
 }
 
 func GetBotAllowedUsers() []int64 {
-	return envToInt64Slice("BOT_ALLOWED_USERS")
+	return EnvToInt64Slice("BOT_ALLOWED_USERS")
 }
 
-func envToInt64Slice(key string) []int64 {
-	var value string
-	if value = os.Getenv(key); value == "" {
-		return []int64{}
-	}
-
-	strItems := strings.Split(value, ",")
-	items := make([]int64, 0, len(strItems))
-
-	var item int64
-	var err error
-	for _, strItem := range strItems {
-		strItem = strings.TrimSpace(strItem)
-		if item, err = strconv.ParseInt(strItem, 10, 64); err != nil {
-			continue
-		}
-		items = append(items, item)
-	}
-
-	return items
+func GetBotDisallowedUsers() []int64 {
+	return EnvToInt64Slice("BOT_DISALLOWED_USERS")
 }

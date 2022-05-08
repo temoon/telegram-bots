@@ -4,10 +4,11 @@ import (
 	"strings"
 
 	"github.com/temoon/telegram-bots-api"
-	. "github.com/temoon/telegram-bots-api/helpers"
+
+	. "github.com/temoon/telegram-bots/helpers"
 )
 
-type Update struct {
+type Request struct {
 	Command         string
 	Payload         string
 	ChatId          int64
@@ -20,22 +21,34 @@ type Update struct {
 	CallbackData    *CallbackData
 }
 
-func (u *Update) HasContact() bool {
-	return u.Message != nil && u.Message.Contact != nil
+func (req *Request) HasContact() bool {
+	return req.Message != nil && req.Message.Contact != nil
 }
 
-func (u *Update) CheckCommand(str string, code int8) bool {
-	return u.Command == str || u.CallbackData != nil && u.CallbackData.Command == code
+func (req *Request) IsCommand(str string, code CommandCode) bool {
+	return req.Command == str || req.CallbackData != nil && req.CallbackData.Command == code
 }
 
-func (u *Update) NewMessageRequired() bool {
-	return u.CallbackData == nil || u.CallbackData.NewMessageRequired
+func (req *Request) GetCallbackDataPayload() interface{} {
+	if req.CallbackData != nil {
+		return req.CallbackData.Payload
+	}
+
+	return nil
 }
 
-func ParseMessage(message *telegram.Message) (update *Update, err error) {
+func (req *Request) NewMessage() bool {
+	return req.CallbackData == nil || req.CallbackData.NewMessage()
+}
+
+func (req *Request) Confirmed() bool {
+	return req.CallbackData == nil || req.CallbackData.Confirmed()
+}
+
+func ParseMessage(message *telegram.Message) (req *Request, err error) {
 	command, payload := parseText(StringOrEmpty(message.Text))
 
-	update = &Update{
+	req = &Request{
 		Command:   command,
 		Payload:   payload,
 		ChatId:    message.Chat.Id,
@@ -45,14 +58,14 @@ func ParseMessage(message *telegram.Message) (update *Update, err error) {
 	}
 
 	if message.From != nil {
-		update.UserId = message.From.Id
-		update.User = message.From
+		req.UserId = message.From.Id
+		req.User = message.From
 	}
 
 	return
 }
 
-func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (update *Update, err error) {
+func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (req *Request, err error) {
 	payload := StringOrEmpty(callbackQuery.Data)
 
 	var callbackData *CallbackData
@@ -60,7 +73,7 @@ func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (update *Update, 
 		return
 	}
 
-	update = &Update{
+	req = &Request{
 		Payload:         payload,
 		UserId:          callbackQuery.From.Id,
 		User:            &callbackQuery.From,
@@ -69,10 +82,10 @@ func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (update *Update, 
 	}
 
 	if callbackQuery.Message != nil {
-		update.ChatId = callbackQuery.Message.Chat.Id
-		update.Chat = &callbackQuery.Message.Chat
-		update.MessageId = callbackQuery.Message.MessageId
-		update.Message = callbackQuery.Message
+		req.ChatId = callbackQuery.Message.Chat.Id
+		req.Chat = &callbackQuery.Message.Chat
+		req.MessageId = callbackQuery.Message.MessageId
+		req.Message = callbackQuery.Message
 	}
 
 	return

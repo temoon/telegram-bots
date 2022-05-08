@@ -7,13 +7,21 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+type CommandCode uint8
+type Flags uint8
+
 type CallbackData struct {
 	_msgpack struct{} `msgpack:",as_array"`
 
-	Command            int8
-	Payload            interface{}
-	NewMessageRequired bool
+	Command CommandCode
+	Payload interface{}
+	Flags   Flags
 }
+
+const (
+	FlagNewMessage Flags = 1 << iota
+	FlagConfirmed
+)
 
 func ParseCallbackData(payload string) (callbackData *CallbackData, err error) {
 	if len(payload) == 0 {
@@ -39,4 +47,12 @@ func (d *CallbackData) String() string {
 	}
 
 	return base64.RawStdEncoding.EncodeToString(data)
+}
+
+func (d *CallbackData) NewMessage() bool {
+	return d.Flags&FlagNewMessage != 0
+}
+
+func (d *CallbackData) Confirmed() bool {
+	return d.Flags&FlagConfirmed != 0
 }
