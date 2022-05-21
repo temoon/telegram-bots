@@ -13,9 +13,10 @@ type Flags uint8
 type CallbackData struct {
 	_msgpack struct{} `msgpack:",as_array"`
 
-	Command CommandCode
-	Payload interface{}
-	Flags   Flags
+	Command  CommandCode
+	Flags    Flags
+	Payload  []byte
+	ReturnTo *CallbackData
 }
 
 const (
@@ -23,7 +24,7 @@ const (
 	FlagConfirmed
 )
 
-func ParseCallbackData(payload string) (callbackData *CallbackData, err error) {
+func DecodeCallbackData(payload string) (callbackData *CallbackData, err error) {
 	if len(payload) == 0 {
 		return nil, errors.New("no callback data")
 	}
@@ -37,6 +38,15 @@ func ParseCallbackData(payload string) (callbackData *CallbackData, err error) {
 		return
 	}
 
+	return
+}
+
+func (d *CallbackData) DecodePayload(payload interface{}) (err error) {
+	return msgpack.Unmarshal(d.Payload, payload)
+}
+
+func (d *CallbackData) EncodePayload(payload interface{}) (err error) {
+	d.Payload, err = msgpack.Marshal(payload)
 	return
 }
 

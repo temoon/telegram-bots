@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -76,4 +77,12 @@ func Weekday(datetime time.Time) (day string) {
 	}
 
 	return
+}
+
+func Url(caption, url string) string {
+	return "[" + caption + "](" + url + ")"
+}
+
+func UserUrl(userId int64) string {
+	return "tg://user?id=" + strconv.FormatInt(userId, 10)
 }

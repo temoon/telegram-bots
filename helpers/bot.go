@@ -11,6 +11,10 @@ import (
 )
 
 func GetUserName(user *telegram.User) (name string) {
+	if user == nil {
+		return
+	}
+
 	if name = strings.TrimSpace(user.FirstName + " " + StringOrEmpty(user.LastName)); name != "" {
 		return
 	}

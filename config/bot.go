@@ -9,6 +9,7 @@ import (
 )
 
 const DefaultBotTimeout = time.Second * 10
+const DefaultBotStaticRoot = "."
 
 func GetBotToken() (value string) {
 	if value = os.Getenv("BOT_TOKEN"); value == "" {
@@ -67,4 +68,16 @@ func GetBotAllowedUsers() []int64 {
 
 func GetBotDisallowedUsers() []int64 {
 	return EnvToInt64Slice("BOT_DISALLOWED_USERS")
+}
+
+func GetBotStaticRoot() (value string) {
+	if value = os.Getenv("LAMBDA_TASK_ROOT"); value != "" {
+		return
+	}
+
+	if value = os.Getenv("BOT_STATIC_ROOT"); value != "" {
+		return
+	}
+
+	return DefaultBotStaticRoot
 }

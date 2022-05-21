@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"strconv"
 	"strings"
 )
 
@@ -44,8 +43,8 @@ func MarkdownCodeBlock(text string) string {
 	return "```" + text + "```"
 }
 
-func MarkdownUserMention(name string, id int64) string {
-	return MarkdownUrl(name, "tg://user?id="+strconv.FormatInt(id, 10))
+func MarkdownUserMention(name string, userId int64) string {
+	return MarkdownUrl(name, UserUrl(userId))
 }
 
 func MarkdownUrl(text string, url string) string {
@@ -54,7 +53,7 @@ func MarkdownUrl(text string, url string) string {
 		return ""
 	}
 
-	return "[" + value + "](" + url + ")"
+	return Url(value, url)
 }
 
 func markdownEscape(entity string, text string) string {

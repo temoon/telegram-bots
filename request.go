@@ -38,7 +38,7 @@ func (req *Request) GetCallbackDataPayload() interface{} {
 }
 
 func (req *Request) NewMessage() bool {
-	return req.CallbackData == nil || req.CallbackData.NewMessage()
+	return req.CallbackData == nil || req.CallbackData.NewMessage() || req.MessageId == 0
 }
 
 func (req *Request) Confirmed() bool {
@@ -69,7 +69,7 @@ func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (req *Request, er
 	payload := StringOrEmpty(callbackQuery.Data)
 
 	var callbackData *CallbackData
-	if callbackData, err = ParseCallbackData(payload); err != nil {
+	if callbackData, err = DecodeCallbackData(payload); err != nil {
 		return
 	}
 
