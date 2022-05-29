@@ -36,8 +36,6 @@ func YandexHandler(ctx context.Context, req *YandexRequest, h BaseHandler) (res 
 		var errWithStatusCode *ErrorWithStatusCode
 		if errors.As(err, &errWithStatusCode) {
 			return &YandexResponse{StatusCode: errWithStatusCode.StatusCode}, nil
-		} else {
-			return &YandexResponse{StatusCode: http.StatusInternalServerError}, err
 		}
 	}
 

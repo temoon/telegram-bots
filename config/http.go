@@ -8,7 +8,7 @@ import (
 
 func GetHttpAddress() (value string) {
 	if value = os.Getenv("HTTP_ADDRESS"); value == "" {
-		log.Fatal("http endpoint required")
+		log.Fatal("http address required")
 	}
 
 	return

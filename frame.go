@@ -114,8 +114,6 @@ func (f *Frame) Listen(ctx context.Context) (err error) {
 			var errWithStatusCode *ErrorWithStatusCode
 			if errors.As(err, &errWithStatusCode) {
 				res.WriteHeader(errWithStatusCode.StatusCode)
-			} else {
-				res.WriteHeader(http.StatusInternalServerError)
 			}
 
 			return
