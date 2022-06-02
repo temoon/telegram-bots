@@ -13,14 +13,24 @@ const DayFriday = "Пт"
 const DaySaturday = "Сб"
 const DaySunday = "Вс"
 
-func Bool(v bool) *bool       { return &v }
-func Int32(v int32) *int32    { return &v }
-func Int64(v int64) *int64    { return &v }
-func String(v string) *string { return &v }
+func Bool(v bool) *bool           { return &v }
+func Int(v int) *int              { return &v }
+func Int32(v int32) *int32        { return &v }
+func Int64(v int64) *int64        { return &v }
+func String(v string) *string     { return &v }
+func Time(v time.Time) *time.Time { return &v }
 
 func BoolOrFalse(ref *bool) bool {
 	if ref == nil {
 		return false
+	}
+
+	return *ref
+}
+
+func IntOrZero(ref *int) int {
+	if ref == nil {
+		return 0
 	}
 
 	return *ref

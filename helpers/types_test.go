@@ -3,6 +3,9 @@ package helpers
 import (
 	"fmt"
 	"testing"
+	"time"
+
+	"github.com/undefinedlabs/go-mpatch"
 )
 
 // region Bool
@@ -25,7 +28,34 @@ func BenchmarkBool(b *testing.B) {
 
 func ExampleBool() {
 	fmt.Println(*Bool(true))
-	// Output: true
+	// Output:
+	// true
+}
+
+// endregion
+
+// region Int
+
+var testCasesInt = []int{-42, 0, 42}
+
+func TestInt(t *testing.T) {
+	for _, value := range testCasesInt {
+		if ref := Int(value); ref == nil || *ref != value {
+			t.Error("Value:", value, "Got:", *ref)
+		}
+	}
+}
+
+func BenchmarkInt(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Int(testCasesInt[i%len(testCasesInt)])
+	}
+}
+
+func ExampleInt() {
+	fmt.Println(*Int(42))
+	// Output:
+	// 42
 }
 
 // endregion
@@ -50,7 +80,8 @@ func BenchmarkInt32(b *testing.B) {
 
 func ExampleInt32() {
 	fmt.Println(*Int32(42))
-	// Output: 42
+	// Output:
+	// 42
 }
 
 // endregion
@@ -75,7 +106,8 @@ func BenchmarkInt64(b *testing.B) {
 
 func ExampleInt64() {
 	fmt.Println(*Int64(42))
-	// Output: 42
+	// Output:
+	// 42
 }
 
 // endregion
@@ -100,7 +132,8 @@ func BenchmarkString(b *testing.B) {
 
 func ExampleString() {
 	fmt.Println(*String("foo"))
-	// Output: foo
+	// Output:
+	// foo
 }
 
 // endregion
@@ -138,6 +171,44 @@ func ExampleBoolOrFalse() {
 	// Output:
 	// true
 	// false
+}
+
+// endregion
+
+// region IntOrZero
+
+type CaseIntOrZero struct {
+	Ref    *int
+	Return int
+}
+
+var testCasesIntOrZero = []CaseIntOrZero{
+	{Ref: nil, Return: 0},
+	{Ref: Int(-42), Return: -42},
+	{Ref: Int(0), Return: 0},
+	{Ref: Int(42), Return: 42},
+}
+
+func TestIntOrZero(t *testing.T) {
+	for _, testCase := range testCasesIntOrZero {
+		if value := IntOrZero(testCase.Ref); value != testCase.Return {
+			t.Error("Ref:", testCase.Ref, "Expected:", testCase.Return, "Got:", value)
+		}
+	}
+}
+
+func BenchmarkIntOrZero(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IntOrZero(testCasesIntOrZero[i%len(testCasesIntOrZero)].Ref)
+	}
+}
+
+func ExampleIntOrZero() {
+	fmt.Println(IntOrZero(Int(42)))
+	fmt.Println(IntOrZero(nil))
+	// Output:
+	// 42
+	// 0
 }
 
 // endregion
@@ -249,7 +320,170 @@ func BenchmarkStringOrEmpty(b *testing.B) {
 func ExampleStringOrEmpty() {
 	fmt.Println(StringOrEmpty(String("foo")))
 	fmt.Println(StringOrEmpty(nil))
-	// Output: foo
+	// Output:
+	// foo
+}
+
+// endregion
+
+// region TimeOrNow
+
+type CaseTimeOrNow struct {
+	Ref    *time.Time
+	Return time.Time
+}
+
+var timeNow = time.Unix(1234567890, 0)
+var timeRef = time.Now().Add(time.Minute)
+
+func init() {
+	_, _ = mpatch.PatchMethod(time.Now, func() time.Time {
+		return timeNow
+	})
+}
+
+var testCasesTimeOrNow = []CaseTimeOrNow{
+	{Ref: nil, Return: timeNow},
+	{Ref: Time(timeRef), Return: timeRef},
+}
+
+func TestTimeOrNow(t *testing.T) {
+	for _, testCase := range testCasesTimeOrNow {
+		if value := TimeOrNow(testCase.Ref); value != testCase.Return {
+			t.Error("Ref:", testCase.Ref, "Expected:", testCase.Return, "Got:", value)
+		}
+	}
+}
+
+func BenchmarkTimeOrNow(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		TimeOrNow(testCasesTimeOrNow[i%len(testCasesTimeOrNow)].Ref)
+	}
+}
+
+func ExampleTimeOrNow() {
+	fmt.Println(TimeOrNow(Time(time.Now().In(time.UTC))))
+	fmt.Println(TimeOrNow(nil).Unix())
+	// Output:
+	// 2009-02-13 23:31:30 +0000 UTC
+	// 1234567890
+}
+
+// endregion
+
+// region Weekday
+
+type CaseWeekday struct {
+	Datetime time.Time
+	Return   string
+}
+
+var testCasesWeekday = []CaseWeekday{
+	{Datetime: time.Unix(1561939200, 0), Return: DayMonday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24), Return: DayTuesday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24 * 2), Return: DayWednesday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24 * 3), Return: DayThursday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24 * 4), Return: DayFriday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24 * 5), Return: DaySaturday},
+	{Datetime: time.Unix(1561939200, 0).Add(time.Hour * 24 * 6), Return: DaySunday},
+}
+
+func TestWeekday(t *testing.T) {
+	for _, testCase := range testCasesWeekday {
+		if value := Weekday(testCase.Datetime); value != testCase.Return {
+			t.Error("Datetime:", testCase.Datetime, "Expected:", testCase.Return, "Got:", value)
+		}
+	}
+}
+
+func BenchmarkWeekday(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Weekday(testCasesWeekday[i%len(testCasesWeekday)].Datetime)
+	}
+}
+
+func ExampleWeekday() {
+	fmt.Println(Weekday(time.Unix(1561939200, 0)))
+	// Output:
+	// Пн
+}
+
+// endregion
+
+// region Url
+
+type CaseUrl struct {
+	Caption string
+	Url     string
+	Return  string
+}
+
+var testCasesUrl = []CaseUrl{
+	{Caption: "", Url: "", Return: "[]()"},
+	{Caption: "foo", Url: "", Return: "[foo]()"},
+	{Caption: "", Url: "https://example.com", Return: "[](https://example.com)"},
+	{Caption: "foo", Url: "https://example.com", Return: "[foo](https://example.com)"},
+	{Caption: "()", Url: "[]", Return: "[()]([])"},
+	{Caption: "[]", Url: "()", Return: "[[]](())"},
+}
+
+func TestUrl(t *testing.T) {
+	for _, testCase := range testCasesUrl {
+		if value := Url(testCase.Caption, testCase.Url); value != testCase.Return {
+			t.Error("Caption:", testCase.Caption, "Url:", testCase.Url, "Expected:", testCase.Return, "Got:", value)
+		}
+	}
+}
+
+func BenchmarkUrl(b *testing.B) {
+	var testCase CaseUrl
+	for i := 0; i < b.N; i++ {
+		testCase = testCasesUrl[i%len(testCasesUrl)]
+		Url(testCase.Caption, testCase.Url)
+	}
+}
+
+func ExampleUrl() {
+	fmt.Println(Url("foo", "https://example.com"))
+	// Output:
+	// [foo](https://example.com)
+}
+
+// endregion
+
+// region UserUrl
+
+type CaseUserUrl struct {
+	UserId int64
+	Return string
+}
+
+var testCasesUserUrl = []CaseUserUrl{
+	{UserId: -42, Return: "tg://user?id=-42"},
+	{UserId: 0, Return: "tg://user?id=0"},
+	{UserId: 42, Return: "tg://user?id=42"},
+}
+
+func TestUserUrl(t *testing.T) {
+	for _, testCase := range testCasesUserUrl {
+		if value := UserUrl(testCase.UserId); value != testCase.Return {
+			t.Error("User ID:", testCase.UserId, "Expected:", testCase.Return, "Got:", value)
+		}
+	}
+}
+
+func BenchmarkUserUrl(b *testing.B) {
+	var testCase CaseUserUrl
+	for i := 0; i < b.N; i++ {
+		testCase = testCasesUserUrl[i%len(testCasesUserUrl)]
+		UserUrl(testCase.UserId)
+	}
+}
+
+func ExampleUserUrl() {
+	fmt.Println(UserUrl(42))
+	// Output:
+	// tg://user?id=42
 }
 
 // endregion
