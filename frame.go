@@ -30,7 +30,8 @@ type Frame struct {
 	mu     sync.Mutex
 	server *http.Server
 
-	Handler BaseHandler
+	Handler Handler
+	BotUser *telegram.User
 }
 
 const (
@@ -40,6 +41,20 @@ const (
 )
 
 func (f *Frame) Run(ctx context.Context) (err error) {
+	if f.BotUser == nil {
+		req := requests.GetMe{}
+
+		var res interface{}
+		if res, err = req.Call(ctx, f.Handler.GetBot()); err != nil {
+			return
+		}
+
+		var ok bool
+		if f.BotUser, ok = res.(*telegram.User); !ok {
+			return errors.New("error while getting bot user")
+		}
+	}
+
 	if config.IsHttpServer() {
 		return f.Listen(ctx)
 	}
@@ -253,6 +268,10 @@ func (f *Frame) onUpdate(ctx context.Context, u *telegram.Update) (err error) {
 			StatusCode: http.StatusBadRequest,
 			Err:        errors.New("unexpected update"),
 		}
+	}
+
+	if f.BotUser != nil {
+		req.BotUsername = StringOrEmpty(f.BotUser.Username)
 	}
 
 	if !config.IsBotUserAllowed(req.UserId) {

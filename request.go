@@ -9,6 +9,7 @@ import (
 )
 
 type Request struct {
+	BotUsername     string
 	Command         string
 	Payload         string
 	ChatId          int64
@@ -26,7 +27,9 @@ func (req *Request) HasContact() bool {
 }
 
 func (req *Request) IsCommand(str string, code CommandCode) bool {
-	return req.Command == str || req.CallbackData != nil && req.CallbackData.Command == code
+	return req.Command == str ||
+		(req.ChatId < 0 && req.BotUsername != "" && req.Command == str+"@"+req.BotUsername) ||
+		(req.CallbackData != nil && req.CallbackData.Command == code)
 }
 
 func (req *Request) GetCallbackDataPayload() interface{} {

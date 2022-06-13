@@ -7,6 +7,11 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+const (
+	FlagNewMessage Flags = 1 << iota
+	FlagConfirmed
+)
+
 type CommandCode uint8
 type Flags uint8
 
@@ -18,11 +23,6 @@ type CallbackData struct {
 	Payload  []byte
 	ReturnTo *CallbackData
 }
-
-const (
-	FlagNewMessage Flags = 1 << iota
-	FlagConfirmed
-)
 
 func DecodeCallbackData(payload string) (callbackData *CallbackData, err error) {
 	if len(payload) == 0 {

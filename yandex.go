@@ -20,7 +20,7 @@ type YandexResponse struct {
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func YandexHandler(ctx context.Context, req *YandexRequest, h BaseHandler) (res *YandexResponse, err error) {
+func YandexHandler(ctx context.Context, req *YandexRequest, h Handler) (res *YandexResponse, err error) {
 	var update telegram.Update
 	if err = json.Unmarshal([]byte(req.Body), &update); err != nil {
 		return &YandexResponse{StatusCode: http.StatusBadRequest}, err

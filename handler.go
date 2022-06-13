@@ -9,28 +9,28 @@ import (
 	"github.com/temoon/telegram-bots/config"
 )
 
-type BaseHandler interface {
+type Handler interface {
 	OnUpdate(context.Context, *Request) error
 	OnShutdown() error
 	GetBot() *telegram.Bot
 }
 
-type Handler struct {
+type BaseHandler struct {
 	mu  sync.Mutex
 	bot *telegram.Bot
 }
 
-func (h *Handler) OnUpdate(ctx context.Context, req *Request) (err error) {
+func (h *BaseHandler) OnUpdate(ctx context.Context, req *Request) (err error) {
 	return
 }
 
-func (h *Handler) OnShutdown() (err error) {
+func (h *BaseHandler) OnShutdown() (err error) {
 	return
 }
 
-func (h *Handler) GetBot() *telegram.Bot {
-	h.Lock()
-	defer h.Unlock()
+func (h *BaseHandler) GetBot() *telegram.Bot {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 
 	if h.bot != nil {
 		return h.bot
@@ -43,12 +43,4 @@ func (h *Handler) GetBot() *telegram.Bot {
 	})
 
 	return h.bot
-}
-
-func (h *Handler) Lock() {
-	h.mu.Lock()
-}
-
-func (h *Handler) Unlock() {
-	h.mu.Unlock()
 }

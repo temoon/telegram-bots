@@ -8,7 +8,15 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/temoon/telegram-bots-api"
 	"github.com/temoon/telegram-bots-api/requests"
+
+	"github.com/temoon/telegram-bots/payloads"
+	. "github.com/temoon/telegram-bots/vars"
 )
+
+type ListItem interface {
+	GetText() string
+	GetCallbackData() *string
+}
 
 func GetUserName(user *telegram.User) (name string) {
 	if user == nil {
@@ -56,4 +64,41 @@ func SendErrorMessage(ctx context.Context, bot *telegram.Bot, chatId int64) {
 	}
 
 	return
+}
+
+func GetListKeyboard(items []ListItem, navPayload payloads.PayloadWithOffset, offset, limit, total int) (keyboard *telegram.InlineKeyboardMarkup) {
+	if len(items) == 0 || offset < 0 || limit <= 0 || total <= 0 {
+		return
+	}
+
+	buttons := make([][]telegram.InlineKeyboardButton, 0, len(items)+1)
+	for _, item := range items {
+		buttons = append(buttons, []telegram.InlineKeyboardButton{
+			{
+				Text:         item.GetText(),
+				CallbackData: item.GetCallbackData(),
+			},
+		})
+	}
+
+	nav := make([]telegram.InlineKeyboardButton, 0, 2)
+	if offset > 0 {
+		nav = append(nav, telegram.InlineKeyboardButton{
+			Text:         TextPrev,
+			CallbackData: String(navPayload.WithOffset(Max(0, offset-limit)).String()),
+		})
+	}
+	if offset+limit < total {
+		nav = append(nav, telegram.InlineKeyboardButton{
+			Text:         TextNext,
+			CallbackData: String(navPayload.WithOffset(Min(total, offset+limit)).String()),
+		})
+	}
+	if len(nav) != 0 {
+		buttons = append(buttons, nav)
+	}
+
+	return &telegram.InlineKeyboardMarkup{
+		InlineKeyboard: buttons,
+	}
 }
