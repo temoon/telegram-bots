@@ -30,15 +30,18 @@ func ReadTemplate(data interface{}, filename ...string) (text string, err error)
 
 func ReadStaticFile(filename ...string) (text string, err error) {
 	var data []byte
-	if data, err = ReadRawStaticFile(filename...); err != nil {
+	if data, err = ReadStaticFileData(filename...); err != nil {
 		return
 	}
 
 	return string(data), nil
 }
 
-func ReadRawStaticFile(filename ...string) (data []byte, err error) {
-	filename = append([]string{config.GetBotStaticRoot()}, filename...)
+func ReadStaticFileData(filename ...string) (data []byte, err error) {
+	if len(filename) != 0 && !path.IsAbs(filename[0]) {
+		filename = append([]string{config.GetBotStaticRoot()}, filename...)
+	}
+
 	if data, err = os.ReadFile(path.Join(filename...)); err != nil {
 		return
 	}
