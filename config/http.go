@@ -3,12 +3,12 @@ package config
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func GetHttpAddress() (value string) {
 	if value = os.Getenv("HTTP_ADDRESS"); value == "" {
-		log.Fatal("http address required")
+		log.Fatal().Msg("http address required")
 	}
 
 	return
@@ -16,7 +16,7 @@ func GetHttpAddress() (value string) {
 
 func GetHttpEndpoint() (value string) {
 	if value = os.Getenv("HTTP_ENDPOINT"); value == "" {
-		log.Fatal("http endpoint required")
+		log.Fatal().Msg("http endpoint required")
 	}
 
 	return

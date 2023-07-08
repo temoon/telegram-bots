@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/temoon/telegram-bots-api"
 )
 
@@ -31,7 +31,7 @@ func YandexHandler(ctx context.Context, req *YandexRequest, h Handler) (res *Yan
 	}
 
 	if err = f.onUpdate(ctx, &update); err != nil {
-		log.WithError(err).Error("on update")
+		log.Error().Err(err).Msg("on update")
 
 		var errWithStatusCode *ErrorWithStatusCode
 		if errors.As(err, &errWithStatusCode) {

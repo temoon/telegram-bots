@@ -9,8 +9,8 @@ import (
 )
 
 type Kafka interface {
-	GetKafka()
-	Shutdown() error
+	GetKafka(string) (*kgo.Client, error)
+	ShutdownKafka() error
 }
 
 type KafkaHandler struct {
@@ -41,7 +41,10 @@ func (h *KafkaHandler) GetKafka(group string) (kafka *kgo.Client, err error) {
 	return h.kafka, nil
 }
 
-func (h *KafkaHandler) Shutdown() (err error) {
+func (h *KafkaHandler) ShutdownKafka() (err error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if h.kafka != nil {
 		h.kafka.Close()
 	}

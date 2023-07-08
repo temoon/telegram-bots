@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -15,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/temoon/telegram-bots-api"
 	"github.com/temoon/telegram-bots-api/requests"
 
@@ -83,7 +82,7 @@ func (f *Frame) Loop(ctx context.Context) (err error) {
 				return
 			}
 
-			log.WithError(err).Error("get updates")
+			log.Error().Err(err).Msg("get updates")
 			time.Sleep(time.Second)
 
 			continue
@@ -93,7 +92,7 @@ func (f *Frame) Loop(ctx context.Context) (err error) {
 			req.Offset = Int32(update.UpdateId + 1)
 
 			if err = f.onUpdate(ctx, &update); err != nil {
-				log.WithError(err).Error("on update")
+				log.Error().Err(err).Msg("on update")
 				continue
 			}
 		}
@@ -110,7 +109,7 @@ func (f *Frame) Listen(ctx context.Context) (err error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc(config.GetHttpEndpoint(), func(res http.ResponseWriter, req *http.Request) {
 		if !f.isRunning() {
-			log.WithError(err).Error("not running")
+			log.Error().Err(err).Msg("not running")
 			res.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -118,13 +117,13 @@ func (f *Frame) Listen(ctx context.Context) (err error) {
 		var err error
 		var update telegram.Update
 		if err = json.NewDecoder(req.Body).Decode(&update); err != nil {
-			log.WithError(err).Error("error while decoding json payload")
+			log.Error().Err(err).Msg("error while decoding json payload")
 			res.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		if err = f.onUpdate(ctx, &update); err != nil {
-			log.WithError(err).Error("on update")
+			log.Error().Err(err).Msg("on update")
 
 			var errWithStatusCode *ErrorWithStatusCode
 			if errors.As(err, &errWithStatusCode) {
@@ -152,7 +151,7 @@ func (f *Frame) Listen(ctx context.Context) (err error) {
 	certKey := config.GetHttpCertKey()
 	if certFile != "" && certKey != "" {
 		var pemCerts []byte
-		if pemCerts, err = ioutil.ReadFile(certFile); err != nil {
+		if pemCerts, err = os.ReadFile(certFile); err != nil {
 			return
 		}
 
@@ -166,14 +165,14 @@ func (f *Frame) Listen(ctx context.Context) (err error) {
 			MinVersion: tls.VersionTLS12,
 		}
 
-		log.Debug("listening for updates in secure mode...")
+		log.Debug().Msg("listening for updates in secure mode...")
 		if err = f.server.ListenAndServeTLS(certFile, certKey); errors.Is(err, http.ErrServerClosed) {
 			return nil
 		} else {
 			return
 		}
 	} else {
-		log.Debug("listening for updates...")
+		log.Debug().Msg("listening for updates...")
 		if err = f.server.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
 			return nil
 		} else {
@@ -188,7 +187,7 @@ func (f *Frame) OnInterrupt(cancel context.CancelFunc) {
 
 	for !f.isShuttingDown() {
 		sig := <-osSignal
-		log.WithField("sig", sig.String()).Debug("signal received")
+		log.Debug().Str("sig", sig.String()).Msg("signal received")
 
 		if sig == os.Interrupt {
 			f.Shutdown(cancel)
@@ -210,7 +209,7 @@ func (f *Frame) Shutdown(cancel context.CancelFunc) {
 
 	var err error
 	if err = f.Handler.OnShutdown(); err != nil {
-		log.WithError(err).Error("error on shutting down handler")
+		log.Error().Err(err).Msg("error on shutting down handler")
 	}
 
 	if f.server != nil {
@@ -218,7 +217,7 @@ func (f *Frame) Shutdown(cancel context.CancelFunc) {
 		defer cancel()
 
 		if err = f.server.Shutdown(ctx); err != nil {
-			log.WithError(err).Error("error while shutting down the HTTP server")
+			log.Error().Err(err).Msg("error while shutting down the HTTP server")
 		}
 	}
 }
@@ -237,7 +236,7 @@ func (f *Frame) onRun() (err error) {
 }
 
 func (f *Frame) onUpdate(ctx context.Context, u *telegram.Update) (err error) {
-	log.WithField("update", u).Debug("update received")
+	log.Debug().Interface("update", u).Msg("update received")
 
 	var req *Request
 	switch {

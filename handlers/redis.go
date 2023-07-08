@@ -4,14 +4,14 @@ import (
 	"sync"
 
 	"github.com/go-redis/redis/v8"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/temoon/telegram-bots/config"
 )
 
 type Redis interface {
 	GetRedis() redis.UniversalClient
-	Shutdown() error
+	ShutdownRedis() error
 }
 
 type RedisHandler struct {
@@ -34,10 +34,13 @@ func (h *RedisHandler) GetRedis() redis.UniversalClient {
 	return h.redis
 }
 
-func (h *RedisHandler) Shutdown() (err error) {
+func (h *RedisHandler) ShutdownRedis() (err error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if h.redis != nil {
 		if err = h.redis.Close(); err != nil {
-			log.WithError(err).Error("close redis")
+			log.Error().Err(err).Msg("close redis")
 		}
 	}
 

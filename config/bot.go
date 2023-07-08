@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/temoon/telegram-bots-api"
 )
 
@@ -13,7 +13,7 @@ const DefaultBotStaticRoot = "."
 
 func GetBotToken() (value string) {
 	if value = os.Getenv("BOT_TOKEN"); value == "" {
-		log.Fatal("bot token required")
+		log.Fatal().Msg("bot token required")
 	}
 
 	return
@@ -22,7 +22,7 @@ func GetBotToken() (value string) {
 func GetBotTimeout() time.Duration {
 	if value := os.Getenv("BOT_TIMEOUT"); value != "" {
 		if timeout, err := time.ParseDuration(value); err != nil {
-			log.WithError(err).Fatal("invalid bot timeout")
+			log.Fatal().Err(err).Msg("invalid bot timeout")
 		} else {
 			return timeout
 		}

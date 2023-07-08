@@ -1,26 +1,17 @@
 package bots
 
 import (
-	"os"
-	"time"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 
 	"github.com/temoon/telegram-bots/config"
 )
 
 func InitLog() {
-	log.SetFormatter(&log.JSONFormatter{
-		TimestampFormat: time.RFC3339Nano,
-		PrettyPrint:     config.IsTestEnvironment(),
-		DataKey:         "meta",
-	})
-
-	log.SetOutput(os.Stdout)
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	if config.IsTestEnvironment() {
-		log.SetLevel(log.TraceLevel)
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	} else {
-		log.SetLevel(log.InfoLevel)
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 }

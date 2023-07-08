@@ -1,42 +1,51 @@
 package handlers
 
 import (
-	"context"
+	"database/sql"
 	"sync"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"github.com/temoon/telegram-bots/config"
 )
 
 type Postgres interface {
-	GetPostgres()
-	Shutdown() error
+	GetPostgres() (*gorm.DB, error)
+	ShutdownPostgres() error
 }
 
 type PostgresHandler struct {
-	mu     sync.Mutex
-	pgPool *pgxpool.Pool
+	mu sync.Mutex
+	db *gorm.DB
 }
 
-func (h *PostgresHandler) GetPostgresPool(ctx context.Context) (postgres *pgxpool.Pool, err error) {
+func (h *PostgresHandler) GetPostgres() (db *gorm.DB, err error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.db != nil {
+		return h.db, nil
+	}
+
+	h.db, err = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  config.GetPostgresUrl(),
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
+
+	return h.db, err
+}
+
+func (h *PostgresHandler) ShutdownPostgres() (err error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	if h.pgPool != nil {
-		return h.pgPool, nil
-	}
+	if h.db != nil {
+		var db *sql.DB
+		if db, err = h.db.DB(); err != nil {
+			return
+		}
 
-	if h.pgPool, err = pgxpool.New(ctx, config.GetPostgresUrl()); err != nil {
-		return
-	}
-
-	return h.pgPool, nil
-}
-
-func (h *PostgresHandler) Shutdown() (err error) {
-	if h.pgPool != nil {
-		h.pgPool.Close()
+		return db.Close()
 	}
 
 	return

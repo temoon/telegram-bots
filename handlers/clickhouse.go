@@ -4,14 +4,14 @@ import (
 	"sync"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/temoon/telegram-bots/config"
 )
 
 type ClickHouse interface {
-	GetClickHouse()
-	Shutdown() error
+	GetClickHouse() (clickhouse.Conn, error)
+	ShutdownClickHouse() error
 }
 
 type ClickHouseHandler struct {
@@ -27,18 +27,18 @@ func (h *ClickHouseHandler) GetClickHouse() (ch clickhouse.Conn, err error) {
 		return h.ch, nil
 	}
 
-	opts := config.GetClickHouseOpts()
-	if h.ch, err = clickhouse.Open(opts); err != nil {
-		return
-	}
+	h.ch, err = clickhouse.Open(config.GetClickHouseOpts())
 
 	return h.ch, nil
 }
 
-func (h *ClickHouseHandler) Shutdown() (err error) {
+func (h *ClickHouseHandler) ShutdownClickHouse() (err error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if h.ch != nil {
 		if err = h.ch.Close(); err != nil {
-			log.WithError(err).Error("close clickhouse")
+			log.Error().Err(err).Msg("close clickhouse")
 		}
 	}
 

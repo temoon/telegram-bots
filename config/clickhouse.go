@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func GetClickHouseOpts() *clickhouse.Options {
@@ -18,7 +18,7 @@ func GetClickHouseOpts() *clickhouse.Options {
 		},
 		Debug: true,
 		Debugf: func(format string, v ...interface{}) {
-			log.Debugf(format, v)
+			log.Debug().Msgf(format, v)
 		},
 		Settings: clickhouse.Settings{
 			"max_execution_time": 60,

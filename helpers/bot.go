@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/temoon/telegram-bots-api"
 	"github.com/temoon/telegram-bots-api/requests"
 
@@ -59,7 +59,7 @@ func SendErrorMessage(ctx context.Context, bot *telegram.Bot, chatId int64) {
 	}
 
 	if _, err := message.Call(ctx, bot); err != nil {
-		log.WithError(err).Error("can't send error message")
+		log.Error().Err(err).Msg("can't send error message")
 		return
 	}
 
