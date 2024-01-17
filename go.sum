@@ -515,7 +515,6 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ClickHouse/ch-go v0.61.1 h1:j5rx3qnvcnYjhnP1IdXE/vdIRQiqgwAzyqOaasA6QCw=
 github.com/ClickHouse/ch-go v0.61.1/go.mod h1:myxt/JZgy2BYHFGQqzmaIpbfr5CMbs3YHVULaWQj5YU=
-github.com/ClickHouse/clickhouse-go v1.5.4 h1:cKjXeYLNWVJIx2J1K6H2CqyRmfwVJVY1OV1coaaFcI0=
 github.com/ClickHouse/clickhouse-go/v2 v2.17.1 h1:ZCmAYWpu75IyEi7+Yrs/uaAjiCGY5wfW5kXo64exkX4=
 github.com/ClickHouse/clickhouse-go/v2 v2.17.1/go.mod h1:rkGTvFDTLqLIm0ma+13xmcCfr/08Gvs7KmFt1tgiWHQ=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
@@ -833,8 +832,8 @@ github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o
 github.com/stretchr/testify v1.8.3/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/temoon/telegram-bots-api v1.700.1 h1:SnMTOSV/LvVrFnmu0VMunPMjmOdkQt+XXRw5f/d+pgg=
-github.com/temoon/telegram-bots-api v1.700.1/go.mod h1:NOl3Qtd69MqtUpH6sig8lJSSGLnLFvQVNUZ9hl4GBz8=
+github.com/temoon/telegram-bots-api v1.700.2 h1:F8fqTg6vBYg4kg2YmXwJ5G2gC4zj7mSlwowY3zRHj28=
+github.com/temoon/telegram-bots-api v1.700.2/go.mod h1:NOl3Qtd69MqtUpH6sig8lJSSGLnLFvQVNUZ9hl4GBz8=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/twmb/franz-go v1.13.3 h1:AO0HcPu7hNMi+ue+jz3CnV+VpuAizaazQuqTo1SvLr4=
 github.com/twmb/franz-go v1.13.3/go.mod h1:jm/FtYxmhxDTN0gNSb26XaJY0irdSVcsckLiR5tQNMk=

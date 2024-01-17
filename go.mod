@@ -7,7 +7,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/rs/zerolog v1.31.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/temoon/telegram-bots-api v1.700.1
+	github.com/temoon/telegram-bots-api v1.700.2
 	github.com/twmb/franz-go v1.13.3
 	github.com/undefinedlabs/go-mpatch v1.0.6
 	github.com/vmihailenco/msgpack/v5 v5.4.1
