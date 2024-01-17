@@ -20,6 +20,7 @@ type BaseHandler struct {
 	bot *telegram.Bot
 }
 
+//goland:noinspection GoUnusedParameter
 func (h *BaseHandler) OnUpdate(ctx context.Context, req *Request) (err error) {
 	return
 }

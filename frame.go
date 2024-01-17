@@ -8,7 +8,6 @@ import (
 	"errors"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"os/signal"
 	"sync"
@@ -67,7 +66,7 @@ func (f *Frame) Loop(ctx context.Context) (err error) {
 	}
 
 	req := requests.GetUpdates{
-		Timeout: Int32(1),
+		Timeout: Int64(1),
 
 		AllowedUpdates: []string{
 			telegram.UpdatesAllowedMessage,
@@ -78,7 +77,7 @@ func (f *Frame) Loop(ctx context.Context) (err error) {
 	var res interface{}
 	for f.isRunning() {
 		if res, err = req.Call(ctx, f.Handler.GetBot()); err != nil {
-			if urlErr, ok := err.(*url.Error); ok && urlErr.Err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				return
 			}
 
@@ -89,7 +88,7 @@ func (f *Frame) Loop(ctx context.Context) (err error) {
 		}
 
 		for _, update := range *res.(*[]telegram.Update) {
-			req.Offset = Int32(update.UpdateId + 1)
+			req.Offset = Int64(update.UpdateId + 1)
 
 			if err = f.onUpdate(ctx, &update); err != nil {
 				log.Error().Err(err).Msg("on update")
@@ -281,7 +280,7 @@ func (f *Frame) onUpdate(ctx context.Context, u *telegram.Update) (err error) {
 	}
 
 	if err = f.Handler.OnUpdate(ctx, req); err != nil {
-		SendErrorMessage(ctx, f.Handler.GetBot(), req.ChatId)
+		SendErrorMessage(ctx, f.Handler.GetBot(), req.ChatId.GetId())
 	}
 
 	return

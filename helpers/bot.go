@@ -18,6 +18,7 @@ type ListItem interface {
 	GetCallbackData() *string
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func GetUserName(user *telegram.User) (name string) {
 	if user == nil {
 		return
@@ -34,11 +35,12 @@ func GetUserName(user *telegram.User) (name string) {
 	return strconv.FormatInt(user.Id, 10)
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func SendInfoMessage(ctx context.Context, bot *telegram.Bot, chatId int64, text string) (err error) {
 	text = "💬 " + text
 
 	message := &requests.SendMessage{
-		ChatId: chatId,
+		ChatId: ChatId(chatId),
 		Text:   text,
 	}
 
@@ -53,7 +55,7 @@ func SendErrorMessage(ctx context.Context, bot *telegram.Bot, chatId int64) {
 	text := "*⚠ Ошибка!* Что-то пошло не так, но мы уже чиним."
 
 	message := &requests.SendMessage{
-		ChatId:    chatId,
+		ChatId:    ChatId(chatId),
 		ParseMode: String(telegram.ParseModeMarkdown),
 		Text:      text,
 	}
@@ -66,6 +68,7 @@ func SendErrorMessage(ctx context.Context, bot *telegram.Bot, chatId int64) {
 	return
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func GetListKeyboard(items []ListItem, navPayload payloads.PayloadWithOffset, offset, limit, total int) (keyboard *telegram.InlineKeyboardMarkup) {
 	if len(items) == 0 || offset < 0 || limit <= 0 || total <= 0 {
 		return

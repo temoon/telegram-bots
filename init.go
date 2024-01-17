@@ -6,6 +6,7 @@ import (
 	"github.com/temoon/telegram-bots/config"
 )
 
+//goland:noinspection GoUnusedExportedFunction
 func InitLog() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 

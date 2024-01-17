@@ -12,11 +12,11 @@ type Request struct {
 	BotUsername     string
 	Command         string
 	Payload         string
-	ChatId          int64
+	ChatId          telegram.ChatId
 	Chat            *telegram.Chat
 	UserId          int64
 	User            *telegram.User
-	MessageId       int32
+	MessageId       int64
 	Message         *telegram.Message
 	CallbackQueryId string
 	CallbackData    *CallbackData
@@ -28,7 +28,7 @@ func (req *Request) HasContact() bool {
 
 func (req *Request) IsCommand(str string, code CommandCode) bool {
 	return req.Command == str ||
-		(req.ChatId < 0 && req.BotUsername != "" && req.Command == str+"@"+req.BotUsername) ||
+		(req.ChatId.GetId() < 0 && req.BotUsername != "" && req.Command == str+"@"+req.BotUsername) ||
 		(req.CallbackData != nil && req.CallbackData.Command == code)
 }
 
@@ -54,7 +54,7 @@ func ParseMessage(message *telegram.Message) (req *Request, err error) {
 	req = &Request{
 		Command:   command,
 		Payload:   payload,
-		ChatId:    message.Chat.Id,
+		ChatId:    ChatId(message.Chat.Id),
 		Chat:      &message.Chat,
 		MessageId: message.MessageId,
 		Message:   message,
@@ -85,10 +85,16 @@ func ParseCallbackQuery(callbackQuery *telegram.CallbackQuery) (req *Request, er
 	}
 
 	if callbackQuery.Message != nil {
-		req.ChatId = callbackQuery.Message.Chat.Id
-		req.Chat = &callbackQuery.Message.Chat
-		req.MessageId = callbackQuery.Message.MessageId
-		req.Message = callbackQuery.Message
+		switch message := callbackQuery.Message.(type) {
+		case telegram.Message:
+			req.ChatId = ChatId(message.Chat.Id)
+			req.Chat = &message.Chat
+			req.MessageId = message.MessageId
+			req.Message = &message
+		case telegram.InaccessibleMessage:
+			req.ChatId = ChatId(message.Chat.Id)
+			req.Chat = &message.Chat
+		}
 	}
 
 	return

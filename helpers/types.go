@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"github.com/temoon/telegram-bots-api"
 	"strconv"
 	"time"
 )
@@ -12,6 +13,10 @@ const DayThursday = "Чт"
 const DayFriday = "Пт"
 const DaySaturday = "Сб"
 const DaySunday = "Вс"
+
+func ChatId(chatId int64) telegram.ChatId {
+	return telegram.NewChatId(chatId, "")
+}
 
 func Bool(v bool) *bool           { return &v }
 func Int(v int) *int              { return &v }
